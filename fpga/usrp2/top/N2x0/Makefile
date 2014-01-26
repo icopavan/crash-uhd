@@ -9,15 +9,15 @@ clean:
 	rm -rf build*
 
 N200R3:
-	make -f Makefile.$@ bin
+	make -f Makefile.$@-crash bin
 
 N210R3:
-	make -f Makefile.$@ bin
+	make -f Makefile.$@-crash bin
 
 N200R4:
-	make -f Makefile.$@ bin
+	make -f Makefile.$@-crash bin
 
 N210R4:
-	make -f Makefile.$@ bin
+	make -f Makefile.$@-crash bin
 
 .PHONY: all clean

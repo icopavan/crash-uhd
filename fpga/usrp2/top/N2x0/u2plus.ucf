@@ -114,40 +114,76 @@ NET "leds<1>"  LOC = "AB18"  ;
 NET "FPGA_RESET"  LOC = "K24"  ;
 
 ## Debug
-NET "debug_clk<0>"  LOC = "AA10"  ;
-NET "debug_clk<1>"  LOC = "AD11"  ;
-NET "debug<0>"  LOC = "AC19"  ;
-NET "debug<1>"  LOC = "AF20"  ;
-NET "debug<2>"  LOC = "AE20"  ;
-NET "debug<3>"  LOC = "AC16"  ;
-NET "debug<4>"  LOC = "AB16"  ;
-NET "debug<5>"  LOC = "AF19"  ;
-NET "debug<6>"  LOC = "AE19"  ;
-NET "debug<7>"  LOC = "V15"  ;
-NET "debug<8>"  LOC = "U15"  ;
-NET "debug<9>"  LOC = "AE17"  ;
-NET "debug<10>"  LOC = "AD17"  ;
-NET "debug<11>"  LOC = "V14"  ;
-NET "debug<12>"  LOC = "W15"  ;
-NET "debug<13>"  LOC = "AC15"  ;
-NET "debug<14>"  LOC = "AD14"  ;
-NET "debug<15>"  LOC = "AC14"  ;
-NET "debug<16>"  LOC = "AC11"  ;
-NET "debug<17>"  LOC = "AB12"  ;
-NET "debug<18>"  LOC = "AC12"  ;
-NET "debug<19>"  LOC = "V13"  ;
-NET "debug<20>"  LOC = "W13"  ;
-NET "debug<21>"  LOC = "AE8"  ;
-NET "debug<22>"  LOC = "AF8"  ;
-NET "debug<23>"  LOC = "V12"  ;
-NET "debug<24>"  LOC = "W12"  ;
-NET "debug<25>"  LOC = "AB9"  ;
-NET "debug<26>"  LOC = "AC9"  ;
-NET "debug<27>"  LOC = "AC8"  ;
-NET "debug<28>"  LOC = "AB7"  ;
-NET "debug<29>"  LOC = "V11"  ;
-NET "debug<30>"  LOC = "U11"  ;
-NET "debug<31>"  LOC = "Y10"  ;
+# NET "debug_clk<0>"  LOC = "AA10"  ;
+# NET "debug_clk<1>"  LOC = "AD11"  ;
+# NET "debug<0>"  LOC = "AC19"  ;
+# NET "debug<1>"  LOC = "AF20"  ;
+# NET "debug<2>"  LOC = "AE20"  ;
+# NET "debug<3>"  LOC = "AC16"  ;
+# NET "debug<4>"  LOC = "AB16"  ;
+# NET "debug<5>"  LOC = "AF19"  ;
+# NET "debug<6>"  LOC = "AE19"  ;
+# NET "debug<7>"  LOC = "V15"  ;
+# NET "debug<8>"  LOC = "U15"  ;
+# NET "debug<9>"  LOC = "AE17"  ;
+# NET "debug<10>"  LOC = "AD17"  ;
+# NET "debug<11>"  LOC = "V14"  ;
+# NET "debug<12>"  LOC = "W15"  ;
+# NET "debug<13>"  LOC = "AC15"  ;
+# NET "debug<14>"  LOC = "AD14"  ;
+# NET "debug<15>"  LOC = "AC14"  ;
+# NET "debug<16>"  LOC = "AC11"  ;
+# NET "debug<17>"  LOC = "AB12"  ;
+# NET "debug<18>"  LOC = "AC12"  ;
+# NET "debug<19>"  LOC = "V13"  ;
+# NET "debug<20>"  LOC = "W13"  ;
+# NET "debug<21>"  LOC = "AE8"  ;
+# NET "debug<22>"  LOC = "AF8"  ;
+# NET "debug<23>"  LOC = "V12"  ;
+# NET "debug<24>"  LOC = "W12"  ;
+# NET "debug<25>"  LOC = "AB9"  ;
+# NET "debug<26>"  LOC = "AC9"  ;
+# NET "debug<27>"  LOC = "AC8"  ;
+# NET "debug<28>"  LOC = "AB7"  ;
+# NET "debug<29>"  LOC = "V11"  ;
+# NET "debug<30>"  LOC = "U11"  ;
+# NET "debug<31>"  LOC = "Y10"  ;
+
+## CRASH Interface
+NET "RX_DATA_CLK_N" LOC = AA10 | IOSTANDARD = LVDS_25; # debug_clk0
+NET "RX_DATA_CLK_P" LOC = Y10  | IOSTANDARD = LVDS_25; # debug_31
+NET "RX_DATA_N[0]"  LOC = U11  | IOSTANDARD = LVDS_25; # debug_30
+NET "RX_DATA_P[0]"  LOC = V11  | IOSTANDARD = LVDS_25; # debug_29
+NET "RX_DATA_N[1]"  LOC = AB7  | IOSTANDARD = LVDS_25; # debug_28
+NET "RX_DATA_P[1]"  LOC = AC8  | IOSTANDARD = LVDS_25; # debug_27
+NET "RX_DATA_N[2]"  LOC = AC9  | IOSTANDARD = LVDS_25; # debug_26
+NET "RX_DATA_P[2]"  LOC = AB9  | IOSTANDARD = LVDS_25; # debug_25
+NET "RX_DATA_N[3]"  LOC = W12  | IOSTANDARD = LVDS_25; # debug_24
+NET "RX_DATA_P[3]"  LOC = V12  | IOSTANDARD = LVDS_25; # debug_23
+NET "RX_DATA_N[4]"  LOC = AF8  | IOSTANDARD = LVDS_25; # debug_22
+NET "RX_DATA_P[4]"  LOC = AE8  | IOSTANDARD = LVDS_25; # debug_21
+NET "RX_DATA_N[5]"  LOC = W13  | IOSTANDARD = LVDS_25; # debug_20
+NET "RX_DATA_P[5]"  LOC = V13  | IOSTANDARD = LVDS_25; # debug_19
+NET "RX_DATA_N[6]"  LOC = AC12 | IOSTANDARD = LVDS_25; # debug_18
+NET "RX_DATA_P[6]"  LOC = AB12 | IOSTANDARD = LVDS_25; # debug_17
+NET "TX_DATA_N[0]"  LOC = AC11 | IOSTANDARD = LVDS_25; # debug_16
+NET "TX_DATA_P[0]"  LOC = AD11 | IOSTANDARD = LVDS_25; # debug_clk1
+NET "TX_DATA_N[1]"  LOC = AC14 | IOSTANDARD = LVDS_25; # debug_15
+NET "TX_DATA_P[1]"  LOC = AD14 | IOSTANDARD = LVDS_25; # debug_14
+NET "TX_DATA_N[2]"  LOC = W15  | IOSTANDARD = LVDS_25; # debug_12
+NET "TX_DATA_P[2]"  LOC = V14  | IOSTANDARD = LVDS_25; # debug_11
+NET "TX_DATA_N[3]"  LOC = AD17 | IOSTANDARD = LVDS_25; # debug_10
+NET "TX_DATA_P[3]"  LOC = AE17 | IOSTANDARD = LVDS_25; # debug_09
+NET "TX_DATA_N[4]"  LOC = U15  | IOSTANDARD = LVDS_25; # debug_08
+NET "TX_DATA_P[4]"  LOC = V15  | IOSTANDARD = LVDS_25; # debug_07
+NET "TX_DATA_N[5]"  LOC = AE19 | IOSTANDARD = LVDS_25; # debug_06
+NET "TX_DATA_P[5]"  LOC = AF19 | IOSTANDARD = LVDS_25; # debug_05
+NET "TX_DATA_N[6]"  LOC = AB16 | IOSTANDARD = LVDS_25; # debug_04
+NET "TX_DATA_P[6]"  LOC = AC16 | IOSTANDARD = LVDS_25; # debug_03
+NET "TX_DATA_N[7]"  LOC = AE20 | IOSTANDARD = LVDS_25; # debug_02
+NET "TX_DATA_P[7]"  LOC = AF20 | IOSTANDARD = LVDS_25; # debug_01
+NET "UART_RX"       LOC = AC19 | IOSTANDARD = LVCMOS25; # debug_00
+NET "SPARE"         LOC = AC15 | IOSTANDARD = LVCMOS25; # debug_13
 
 ## UARTS
 NET "TXD<3>"  LOC = "AD20"  ;

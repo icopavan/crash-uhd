@@ -23,7 +23,7 @@
 module u2plus
   (
    input CLK_FPGA_P, input CLK_FPGA_N,  // Diff
-   
+
    // ADC
    input ADC_clkout_p, input ADC_clkout_n,
    input ADCA_12_p, input ADCA_12_n,
@@ -40,12 +40,12 @@ module u2plus
    input ADCB_4_p, input ADCB_4_n,
    input ADCB_2_p, input ADCB_2_n,
    input ADCB_0_p, input ADCB_0_n,
-   
+
    // DAC
    output reg [15:0] DACA,
    output reg [15:0] DACB,
    input DAC_LOCK,     // unused for now
-   
+
    // DB IO Pins
    inout [15:0] io_tx,
    inout [15:0] io_rx,
@@ -53,11 +53,19 @@ module u2plus
    // Misc, debug
    output [5:1] leds,  // LED4 is shared w/INIT_B
    input FPGA_RESET,
-   output [1:0] debug_clk,
-   output [31:0] debug,
    output [3:1] TXD, input [3:1] RXD, // UARTs
    //input [3:0] dipsw,  // Forgot DIP Switches...
-   
+
+   // CRASH (on debug pins)
+   output        RX_DATA_CLK_N,
+   output        RX_DATA_CLK_P,
+   output [6:0]  RX_DATA_N,
+   output [6:0]  RX_DATA_P,
+   input  [7:0]  TX_DATA_N,
+   input  [7:0]  TX_DATA_P,
+   input         SPARE,
+   input         UART_RX,
+
    // Clock Gen Control
    output [1:0] clk_en,
    output [1:0] clk_sel,
@@ -101,21 +109,21 @@ module u2plus
    output MDC,
    output PHY_RESETn,
    output ETH_LED,
-   
+
 //   input POR,
-   
+
    // Expansion
    input exp_time_in_p, input exp_time_in_n, // Diff
-   output exp_time_out_p, output exp_time_out_n, // Diff 
+   output exp_time_out_p, output exp_time_out_n, // Diff
    input exp_user_in_p, input exp_user_in_n, // Diff
-   output exp_user_out_p, output exp_user_out_n, // Diff 
-   
+   output exp_user_out_p, output exp_user_out_n, // Diff
+
    // SERDES
    output ser_enable,
    output ser_prbsen,
    output ser_loopen,
    output ser_rx_en,
-   
+
    output ser_tx_clk,
    output reg [15:0] ser_t,
    output reg ser_tklsb,
@@ -136,7 +144,7 @@ module u2plus
    output RAM_WEn,
    output RAM_CENn,
    output RAM_CLK,
-   
+
    // SPI Flash
    output flash_cs,
    output flash_clk,
@@ -147,17 +155,17 @@ module u2plus
    wire  CLK_TO_MAC_int, CLK_TO_MAC_int2;
    IBUFG phyclk (.O(CLK_TO_MAC_int), .I(CLK_TO_MAC));
    BUFG phyclk2 (.O(CLK_TO_MAC_int2), .I(CLK_TO_MAC_int));
-      
+
    // FPGA-specific pins connections
    wire 	clk_fpga, dsp_clk, clk_div, dcm_out, wb_clk, clock_ready;
 
    IBUFGDS clk_fpga_pin (.O(clk_fpga),.I(CLK_FPGA_P),.IB(CLK_FPGA_N));
    defparam 	clk_fpga_pin.IOSTANDARD = "LVPECL_25";
-   
+
    wire 	exp_time_in;
    IBUFDS exp_time_in_pin (.O(exp_time_in),.I(exp_time_in_p),.IB(exp_time_in_n));
    defparam 	exp_time_in_pin.IOSTANDARD = "LVDS_25";
-   
+
    wire 	exp_time_out;
    OBUFDS exp_time_out_pin (.O(exp_time_out_p),.OB(exp_time_out_n),.I(exp_time_out));
    defparam 	exp_time_out_pin.IOSTANDARD  = "LVDS_25";
@@ -165,7 +173,7 @@ module u2plus
    wire 	exp_user_in;
    IBUFDS exp_user_in_pin (.O(exp_user_in),.I(exp_user_in_p),.IB(exp_user_in_n));
    defparam 	exp_user_in_pin.IOSTANDARD = "LVDS_25";
-   
+
    wire 	exp_user_out;
    OBUFDS exp_user_out_pin (.O(exp_user_out_p),.OB(exp_user_out_n),.I(exp_user_out));
    defparam 	exp_user_out_pin.IOSTANDARD  = "LVDS_25";
@@ -180,11 +188,11 @@ module u2plus
 `ifdef LVDS
    wire [13:0] 	adc_a, adc_a_inv, adc_b;
    capture_ddrlvds #(.WIDTH(14)) capture_ddrlvds
-     (.clk(dsp_clk), .ssclk_p(ADC_clkout_p), .ssclk_n(ADC_clkout_n), 
+     (.clk(dsp_clk), .ssclk_p(ADC_clkout_p), .ssclk_n(ADC_clkout_n),
       .in_p({{ADCA_12_p, ADCA_10_p, ADCA_8_p, ADCA_6_p, ADCA_4_p, ADCA_2_p, ADCA_0_p},
-	     {ADCB_12_p, ADCB_10_p, ADCB_8_p, ADCB_6_p, ADCB_4_p, ADCB_2_p, ADCB_0_p}}), 
+	     {ADCB_12_p, ADCB_10_p, ADCB_8_p, ADCB_6_p, ADCB_4_p, ADCB_2_p, ADCB_0_p}}),
       .in_n({{ADCA_12_n, ADCA_10_n, ADCA_8_n, ADCA_6_n, ADCA_4_n, ADCA_2_n, ADCA_0_n},
-	     {ADCB_12_n, ADCB_10_n, ADCB_8_n, ADCB_6_n, ADCB_4_n, ADCB_2_n, ADCB_0_n}}), 
+	     {ADCB_12_n, ADCB_10_n, ADCB_8_n, ADCB_6_n, ADCB_4_n, ADCB_2_n, ADCB_0_n}}),
       .out({adc_a_inv,adc_b}));
    assign adc_a = ~adc_a_inv;
 `else
@@ -199,26 +207,26 @@ module u2plus
 	adc_b <= adc_b_pre;
      end
 `endif // !`ifdef LVDS
-   
+
    // Handle Clocks
-   DCM DCM_INST (.CLKFB(dsp_clk), 
-                 .CLKIN(clk_fpga), 
-                 .DSSEN(0), 
-                 .PSCLK(0), 
-                 .PSEN(0), 
-                 .PSINCDEC(0), 
-                 .RST(dcm_rst), 
-                 .CLKDV(clk_div), 
-                 .CLKFX(), 
-                 .CLKFX180(), 
-                 .CLK0(dcm_out), 
-                 .CLK2X(), 
-                 .CLK2X180(), 
-                 .CLK90(), 
-                 .CLK180(), 
-                 .CLK270(clk270_100), 
-                 .LOCKED(LOCKED_OUT), 
-                 .PSDONE(), 
+   DCM DCM_INST (.CLKFB(dsp_clk),
+                 .CLKIN(clk_fpga),
+                 .DSSEN(0),
+                 .PSCLK(0),
+                 .PSEN(0),
+                 .PSINCDEC(0),
+                 .RST(dcm_rst),
+                 .CLKDV(clk_div),
+                 .CLKFX(),
+                 .CLKFX180(),
+                 .CLK0(dcm_out),
+                 .CLK2X(),
+                 .CLK2X180(),
+                 .CLK90(),
+                 .CLK180(),
+                 .CLK270(clk270_100),
+                 .LOCKED(LOCKED_OUT),
+                 .PSDONE(),
                  .STATUS());
    defparam DCM_INST.CLK_FEEDBACK = "1X";
    defparam DCM_INST.CLKDV_DIVIDE = 2.0;
@@ -239,7 +247,7 @@ module u2plus
    BUFG wbclk_BUFG (.I(clk_div), .O(wb_clk));
 
    // Create clock for external SRAM thats -90degree phase to DSPCLK (i.e) 2nS earlier at 100MHz.
-   BUFG  clk270_100_buf_i1 (.I(clk270_100), 
+   BUFG  clk270_100_buf_i1 (.I(clk270_100),
 			    .O(clk270_100_buf));
    OFDDRRSE RAM_CLK_i1 (.Q(RAM_CLK),
 			.C0(clk270_100_buf),
@@ -249,7 +257,7 @@ module u2plus
 			.D1(1'b0),
 			.R(1'b0),
 			.S(1'b0));
-  
+
    // I2C -- Don't use external transistors for open drain, the FPGA implements this
    IOBUF scl_pin(.O(scl_pad_i), .IO(SCL), .I(scl_pad_o), .T(scl_pad_oen_o));
    IOBUF sda_pin(.O(sda_pad_i), .IO(SDA), .I(sda_pad_o), .T(sda_pad_oen_o));
@@ -257,7 +265,7 @@ module u2plus
    // LEDs are active low outputs
    wire [5:0] leds_int;
    assign     {ETH_LED,leds} = {6'b011111 ^ leds_int};  // drive low to turn on leds
-   
+
    // SPI
    wire       miso, mosi, sclk;
 
@@ -270,15 +278,15 @@ module u2plus
    assign 	{SCLK_RX_DB,MOSI_RX_DB}    = ~SEN_RX_DB ? {sclk,mosi} : 2'B0;
    assign 	{SCLK_RX_DAC,MOSI_RX_DAC}  = ~SEN_RX_DAC ? {sclk,mosi} : 2'B0;
    assign 	{SCLK_RX_ADC,MOSI_RX_ADC}  = ~SEN_RX_ADC ? {sclk,mosi} : 2'B0;
-   
+
    assign 	miso 			   = (~SEN_CLK & MISO_CLK) | (~SEN_DAC & MISO_DAC) |
 					     (~SEN_TX_DB & MISO_TX_DB) | (~SEN_TX_ADC & MISO_TX_ADC) |
 					     (~SEN_RX_DB & MISO_RX_DB) | (~SEN_RX_ADC & MISO_RX_ADC);
-   
+
    wire 	GMII_TX_EN_unreg, GMII_TX_ER_unreg;
    wire [7:0] 	GMII_TXD_unreg;
    wire 	GMII_GTX_CLK_int;
-   
+
    always @(posedge GMII_GTX_CLK_int)
      begin
 	GMII_TX_EN <= GMII_TX_EN_unreg;
@@ -286,7 +294,7 @@ module u2plus
 	GMII_TXD <= GMII_TXD_unreg;
      end
 
-   OFDDRRSE OFDDRRSE_gmii_inst 
+   OFDDRRSE OFDDRRSE_gmii_inst
      (.Q(GMII_GTX_CLK),      // Data output (connect directly to top-level port)
       .C0(GMII_GTX_CLK_int),    // 0 degree clock input
       .C1(~GMII_GTX_CLK_int),    // 180 degree clock input
@@ -296,11 +304,11 @@ module u2plus
       .R(0),      // Synchronous reset input
       .S(0)       // Synchronous preset input
       );
-   
+
    wire ser_tklsb_unreg, ser_tkmsb_unreg;
    wire [15:0] ser_t_unreg;
    wire        ser_tx_clk_int;
-   
+
    always @(posedge ser_tx_clk_int)
      begin
 	ser_tklsb <= ser_tklsb_unreg;
@@ -319,9 +327,9 @@ module u2plus
 	ser_rklsb_int <= ser_rklsb;
 	ser_rkmsb_int <= ser_rkmsb;
      end
-   
+
    /*
-   OFDDRRSE OFDDRRSE_serdes_inst 
+   OFDDRRSE OFDDRRSE_serdes_inst
      (.Q(ser_tx_clk),      // Data output (connect directly to top-level port)
       .C0(ser_tx_clk_int),    // 0 degree clock input
       .C1(~ser_tx_clk_int),    // 180 degree clock input
@@ -340,10 +348,10 @@ module u2plus
    wire [35:0] RAM_D_pi;
    wire [35:0] RAM_D_po;
    wire        RAM_D_poe;
-   
+
    genvar      i;
-   
-   generate  
+
+   generate
       for (i=0;i<36;i=i+1)
         begin : gen_RAM_D_IO
 
@@ -361,8 +369,8 @@ module u2plus
 	end // block: gen_RAM_D_IO
    endgenerate
 
-   
-   
+
+
    wire [15:0] dac_a_int, dac_b_int;
    // DAC A and B are swapped in schematic to facilitate clean layout
    // DAC A is also inverted in schematic to facilitate clean layout
@@ -371,15 +379,20 @@ module u2plus
 
    wire 	pps;
    assign pps = PPS_IN ^ PPS2_IN;
-   
+
    u2plus_core u2p_c(.dsp_clk           (dsp_clk),
 		     .wb_clk            (wb_clk),
 		     .clock_ready       (clock_ready),
 		     .clk_to_mac	(CLK_TO_MAC_int2),
 		     .pps_in		(pps),
 		     .leds		(leds_int),
-		     .debug		(debug[31:0]),
-		     .debug_clk		(debug_clk[1:0]),
+         .RX_DATA_CLK_N(RX_DATA_CLK_N),
+         .RX_DATA_CLK_P(RX_DATA_CLK_P),
+         .RX_DATA_N(RX_DATA_N[6:0]),
+         .RX_DATA_P(RX_DATA_P[6:0]),
+         .TX_DATA_N(TX_DATA_N[7:0]),
+         .TX_DATA_P(TX_DATA_P[7:0]),
+         .UART_RX(UART_RX),
 		     .exp_time_in	(exp_time_in),
 		     .exp_time_out	(exp_time_out),
 		     .GMII_COL		(GMII_COL),
@@ -451,7 +464,7 @@ module u2plus
 		     .RAM_CENn          (RAM_CENn),
 		     .RAM_WEn           (RAM_WEn),
 		     .RAM_OEn           (RAM_OEn),
-		     .RAM_LDn           (RAM_LDn), 
+		     .RAM_LDn           (RAM_LDn),
 		     .uart_tx_o         (TXD[3:1]),
 		     .uart_rx_i         ({1'b1,RXD[3:1]}),
 		     .uart_baud_o       (),
@@ -469,5 +482,5 @@ module u2plus
    // Byte Writes are qualified by the global write enable
    // Always do 36bit operations to extram.
    assign RAM_BWn = 4'b0000;
-   
+
 endmodule // u2plus
