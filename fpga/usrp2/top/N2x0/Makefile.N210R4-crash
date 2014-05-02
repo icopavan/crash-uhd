@@ -13,10 +13,10 @@ CUSTOM_SRCS = $(abspath $(addprefix $(BASE_DIR)/../crash/, \
 crash_ddr_intf.vhd \
 trunc_unbiased.vhd \
 uart.vhd \
-fifo_2x_to_1x.vhd \
-fifo_2x_to_1x.ngc \
-fifo_1x_to_2x.vhd \
-fifo_1x_to_2x.ngc \
+fifo_16x15.vhd \
+fifo_16x15.ngc \
+fifo_16x18.vhd \
+fifo_16x18.ngc \
 ))
 
 CUSTOM_DEFS =
